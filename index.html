@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>雲朵辨識系統</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="bg-white p-8 rounded-2xl shadow-xl max-w-xl w-full text-center transition-all duration-300">
+        <h1 class="text-3xl font-bold text-slate-800 mb-6 flex justify-center items-center gap-2">
+            ☁️ 雲朵辨識系統
+        </h1>
+        
+        <div id="game-box" class="min-h-[160px] flex flex-col justify-center items-center mb-6">
+            <button id="start-btn" onclick="startGame()" class="bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold px-8 py-4 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:scale-105">
+                開始辨識雲
+            </button>
+        </div>
+
+        <hr class="border-slate-100 my-4">
+
+        <div class="flex items-center justify-center gap-2 text-sm text-slate-400">
+            <span>📊 累積瀏覽人次：</span>
+            <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fcloud-identifier-demo.github.io&count_bg=%233B82F6&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" alt="瀏覽人數"/>
+        </div>
+    </div>
+
+    <script>
+        // 決策樹資料結構
+        const decisionTree = {
+            q1: { text: "是否有聽到雷聲或閃電？", type: "question", yes: "r_cb", no: "q2" },
+            q2: { text: "是否能清楚看見個別的突起小圓丘或小圓頂？", type: "question", yes: "q3", no: "q4" },
+            q3: { text: "是否能在雲層上部(三等分)處找到模糊的輪廓？", type: "question", yes: "r_cb", no: "r_cu" },
+            q4: { text: "是否存在沒有卷曲形狀的均勻、連續或破裂的層狀結構的雲？", type: "question", yes: "q5", no: "q8" },
+            q5: { text: "太陽或月亮是否看起來像一明亮的斑塊？", type: "question", yes: "r_cs", no: "q6" },
+            q6: { text: "是否存在隆起的灰色或藍灰色至深灰色片狀層狀結構的雲？", type: "question", yes: "r_as", no: "q7" },
+            q7: { text: "雲是否有緻密、延展的下層，且外觀呈濕潤狀或擴散狀？", type: "question", yes: "r_ni", no: "r_st" },
+            q8: { text: "是否存在白色絲狀雲，像纖維一樣？", type: "question", yes: "r_ci", no: "q9" },
+            q9: { text: "是否每個雲塊小於伸出手後一根手指的寬度？", type: "question", yes: "r_cc", no: "q10" },
+            q10: { text: "是否每個雲塊介於伸出手後一根手指到三根手指的寬度？", type: "question", yes: "r_ac", no: "r_sc" },
+
+            // 結果
+            r_cb: { text: "積雨雲 Cb", type: "result" },
+            r_cu: { text: "積雲 Cu", type: "result" },
+            r_cs: { text: "卷層雲 Cs", type: "result" },
+            r_as: { text: "高層雲 As", type: "result" },
+            r_ni: { text: "雨層雲 Ni", type: "result" },
+            r_st: { text: "層雲 St", type: "result" },
+            r_ci: { text: "卷雲 Ci", type: "result" },
+            r_cc: { text: "卷積雲 Cc", type: "result" },
+            r_ac: { text: "高積雲 Ac", type: "result" },
+            r_sc: { text: "層積雲 Sc", type: "result" }
+        };
+
+        const gameBox = document.getElementById('game-box');
+
+        function startGame() {
+            renderNode('q1');
+        }
+
+        function renderNode(nodeId) {
+            const node = decisionTree[nodeId];
+            if (node.type === "question") {
+                gameBox.innerHTML = `
+                    <p class="text-xl font-medium text-slate-700 mb-8 leading-relaxed">${node.text}</p>
+                    <div class="flex gap-4 w-full justify-center">
+                        <button onclick="renderNode('${node.yes}')" class="w-32 bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 rounded-xl shadow cursor-pointer transition-all hover:scale-105">
+                            有
+                        </button>
+                        <button onclick="renderNode('${node.no}')" class="w-32 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-3 rounded-xl shadow cursor-pointer transition-all hover:scale-105">
+                            沒有
+                        </button>
+                    </div>
+                `;
+            } else if (node.type === "result") {
+                gameBox.innerHTML = `
+                    <div class="animate-bounce text-5xl mb-4">🔍</div>
+                    <p class="text-xs font-bold text-blue-500 tracking-wider uppercase mb-1">辨識結果</p>
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-8">${node.text}</h2>
+                    <button onclick="startGame()" class="text-sm font-semibold text-slate-500 hover:text-blue-600 underline cursor-pointer transition-all">
+                        重新辨識
+                    </button>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
