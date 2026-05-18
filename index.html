@@ -18,17 +18,10 @@
             ☁️ 雲朵辨識系統
         </h1>
         
-        <div id="game-box" class="min-h-[160px] flex flex-col justify-center items-center mb-6">
+        <div id="game-box" class="min-h-[160px] flex flex-col justify-center items-center">
             <button id="start-btn" onclick="startGame()" class="bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold px-8 py-4 rounded-full shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:scale-105">
                 開始辨識雲
             </button>
-        </div>
-
-        <hr class="border-slate-100 my-4">
-
-        <div class="flex items-center justify-center gap-2 text-sm text-slate-400">
-            <span>📊 累積瀏覽人次：</span>
-            <img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fcloud-identifier-demo.github.io&count_bg=%233B82F6&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false" alt="瀏覽人數"/>
         </div>
     </div>
 
@@ -46,7 +39,7 @@
             q9: { text: "是否每個雲塊小於伸出手後一根手指的寬度？", type: "question", yes: "r_cc", no: "q10" },
             q10: { text: "是否每個雲塊介於伸出手後一根手指到三根手指的寬度？", type: "question", yes: "r_ac", no: "r_sc" },
 
-            // 結果
+            // 結果 (配圖檔名固定為 sc.jpg)
             r_cb: { text: "積雨雲 Cb", type: "result" },
             r_cu: { text: "積雲 Cu", type: "result" },
             r_cs: { text: "卷層雲 Cs", type: "result" },
@@ -56,7 +49,7 @@
             r_ci: { text: "卷雲 Ci", type: "result" },
             r_cc: { text: "卷積雲 Cc", type: "result" },
             r_ac: { text: "高積雲 Ac", type: "result" },
-            r_sc: { text: "層積雲 Sc", type: "result" }
+            r_sc: { text: "層積雲 Sc", type: "result", image: "sc.jpg" }
         };
 
         const gameBox = document.getElementById('game-box');
@@ -80,11 +73,22 @@
                     </div>
                 `;
             } else if (node.type === "result") {
+                // 檢查該結果是否有設定對應的圖片
+                let imageHtml = "";
+                if (node.image) {
+                    imageHtml = `
+                        <div class="w-full my-4 overflow-hidden rounded-xl shadow-md border border-slate-200">
+                            <img src="${node.image}" alt="${node.text}" class="w-full h-auto object-cover max-h-72">
+                        </div>
+                    `;
+                }
+
                 gameBox.innerHTML = `
-                    <div class="animate-bounce text-5xl mb-4">🔍</div>
+                    <div class="animate-bounce text-5xl mb-2">🔍</div>
                     <p class="text-xs font-bold text-blue-500 tracking-wider uppercase mb-1">辨識結果</p>
-                    <h2 class="text-3xl font-extrabold text-slate-900 mb-8">${node.text}</h2>
-                    <button onclick="startGame()" class="text-sm font-semibold text-slate-500 hover:text-blue-600 underline cursor-pointer transition-all">
+                    <h2 class="text-3xl font-extrabold text-slate-900 mb-4">${node.text}</h2>
+                    ${imageHtml}
+                    <button onclick="startGame()" class="mt-4 text-sm font-semibold text-slate-500 hover:text-blue-600 underline cursor-pointer transition-all">
                         重新辨識
                     </button>
                 `;
