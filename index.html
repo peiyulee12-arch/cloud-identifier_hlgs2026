@@ -39,17 +39,19 @@
             q9: { text: "是否每個雲塊小於伸出手後一根手指的寬度？", type: "question", yes: "r_cc", no: "q10" },
             q10: { text: "是否每個雲塊介於伸出手後一根手指到三根手指的寬度？", type: "question", yes: "r_ac", no: "r_sc" },
 
-            // 結果 (配圖檔名固定為 sc.jpg)
+            // 結果區域：這裡將 image 改為 images 陣列，可以放 1 到多張相片
             r_cb: { text: "積雨雲 Cb", type: "result" },
             r_cu: { text: "積雲 Cu", type: "result" },
-            r_cs: { text: "卷層雲 Cs", type: "result", image: "cs.jpg" },
+            // 💡 卷層雲：設定了兩張照片，程式會隨機抽一張顯示
+            r_cs: { text: "卷層雲 Cs", type: "result", images: ["cs1.jpg", "cs2.jpg"] }, 
             r_as: { text: "高層雲 As", type: "result" },
             r_ni: { text: "雨層雲 Ni", type: "result" },
             r_st: { text: "層雲 St", type: "result" },
             r_ci: { text: "卷雲 Ci", type: "result" },
             r_cc: { text: "卷積雲 Cc", type: "result" },
             r_ac: { text: "高積雲 Ac", type: "result" },
-            r_sc: { text: "層積雲 Sc", type: "result", image: "sc.jpg" }
+            // 💡 層積雲：只有一張照片也適用此寫法，直接包在方括號裡面
+            r_sc: { text: "層積雲 Sc", type: "result", images: ["sc.jpg"] } 
         };
 
         const gameBox = document.getElementById('game-box');
@@ -73,12 +75,17 @@
                     </div>
                 `;
             } else if (node.type === "result") {
-                // 檢查該結果是否有設定對應的圖片
                 let imageHtml = "";
-                if (node.image) {
+                
+                // 檢查是否有設定 images 陣列，且陣列裡面有東西
+                if (node.images && node.images.length > 0) {
+                    // 💡 核心改動：隨機從陣列中挑選一個索引 index
+                    const randomIndex = Math.floor(Math.random() * node.images.length);
+                    const selectedImage = node.images[randomIndex];
+
                     imageHtml = `
                         <div class="w-full my-4 overflow-hidden rounded-xl shadow-md border border-slate-200">
-                            <img src="${node.image}" alt="${node.text}" class="w-full h-auto object-cover max-h-72">
+                            <img src="${selectedImage}" alt="${node.text}" class="w-full h-auto object-cover max-h-72">
                         </div>
                     `;
                 }
